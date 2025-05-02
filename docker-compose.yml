@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  nuxt-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: projeto-pricing-frontend
+    ports:
+      - "3000:3000"  # Porta padrão do Nuxt
+      - "24678:24678" # Porta para hot module reload
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - NODE_ENV=development
+    command: npm run dev
+    stdin_open: true
+    tty: true
+    restart: unless-stopped 
