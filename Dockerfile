@@ -39,7 +39,6 @@ ENV NODE_ENV=production
 # pelos valores fornecidos no docker-compose ou plataforma de hospedagem
 ENV SUPABASE_URL=placeholder
 ENV SUPABASE_KEY=placeholder
-ENV SUPABASE_SERVICE_KEY=placeholder
 
 # Comando para iniciar a aplicação em modo de produção
 CMD ["node", "server/index.mjs"] 
