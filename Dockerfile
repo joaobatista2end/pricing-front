@@ -10,7 +10,6 @@ RUN pnpm install
 COPY . .
 RUN pnpm run build
 
-
 FROM node:20-alpine AS runner
 
 WORKDIR /app

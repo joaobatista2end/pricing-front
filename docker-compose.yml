@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  nuxt-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: projeto-pricing-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      # Volume para o .env
+      - ./.env:/app/.env:ro
+      # Volume para logs (persistentes)
+      - nuxt-logs:/app/logs
+      # Volumes para desenvolvimento (opcional, comente em produção)
+      # - ./components:/app/components
+      # - ./pages:/app/pages
+      # - ./layouts:/app/layouts
+      # - ./assets:/app/assets
+      # - ./public:/app/public
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - pricing-network
+
+networks:
+  pricing-network:
+    driver: bridge
+
+volumes:
+  nuxt-logs:
+    driver: local 
