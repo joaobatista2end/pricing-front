@@ -15,5 +15,9 @@ export default defineNuxtConfig({
   },
   alias: {
     "@modules": resolve(__dirname, "modules"),
+  },
+  devServer: {
+    port: 8080,
+    host: '0.0.0.0',
   }
 });

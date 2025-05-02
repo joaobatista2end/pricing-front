@@ -1,4 +1,5 @@
-FROM node:18-alpine
+# Estágio de build
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
@@ -14,9 +15,25 @@ RUN npm install
 # Copia o restante dos arquivos do projeto
 COPY . .
 
-# Expõe as portas 
-EXPOSE 3000
-EXPOSE 24678
+# Executa o build da aplicação
+RUN npm run build
 
-# Comando para iniciar o servidor de desenvolvimento
-CMD ["npm", "run", "dev"] 
+# Estágio de produção
+FROM node:18-alpine AS production
+
+WORKDIR /app
+
+# Copia apenas os arquivos necessários do estágio de build
+COPY --from=build /app/.output ./
+COPY --from=build /app/package.json ./
+
+# Expõe a porta 
+EXPOSE 8080
+
+# Define variáveis de ambiente para produção
+ENV HOST=0.0.0.0
+ENV PORT=8080
+ENV NODE_ENV=production
+
+# Comando para iniciar a aplicação em modo de produção
+CMD ["node", "server/index.mjs"] 
