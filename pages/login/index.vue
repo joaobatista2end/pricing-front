@@ -40,10 +40,10 @@ const signInWithGoogle = async () => {
         
         if (error) {
             console.error("Erro ao autenticar:", error.message);
-            UNotification.add({
+            useToast().add({
                 title: 'Erro ao autenticar',
                 description: error.message,
-                color: 'red'
+                color: 'error'
             });
         }
     } catch (err) {
