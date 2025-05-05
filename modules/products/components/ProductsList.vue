@@ -4,69 +4,108 @@
     <div class="mb-4">
       <UCard class="mb-3">
         <div class="space-y-3">
-
           <UFormField label="Pesquisar" class="mb-4">
-            <UInput 
-              v-model="searchQuery" 
-              placeholder="Nome, código de barras..." 
+            <UInput
+              v-model="searchQuery"
+              placeholder="Nome, código de barras..."
               icon="i-heroicons-magnifying-glass"
               class="w-1/2"
               @input="debouncedFilter"
             />
           </UFormField>
-          
+
           <!-- Primeira linha de filtros -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div>
               <UFormField label="Departamento">
-                <UInputMenu
-                  v-model="selectedDepartment"
-                  :items="departmentOptions"
-                  value-key="value"
-                  class="w-full"
-                  placeholder="Selecione um departamento"
-                  :loading="isDepartmentsLoading"
-                  @update:model-value="applyServerFilters"
-                />
+                <div class="flex items-center space-x-2">
+                  <UInputMenu
+                    v-model="selectedDepartment"
+                    :items="departmentOptions"
+                    value-key="value"
+                    class="w-full"
+                    placeholder="Selecione um departamento"
+                    :loading="isDepartmentsLoading"
+                    @update:model-value="applyServerFilters"
+                  />
+                  <UButton
+                    v-if="selectedDepartment"
+                    color="primary"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    :loading="isLoading"
+                    @click="clearDepartmentFilter"
+                  />
+                </div>
               </UFormField>
             </div>
             <div>
               <UFormField label="Grupo">
-                <UInputMenu
-                  v-model="selectedGroup"
-                  :items="groupOptions"
-                  value-key="value"
-                  class="w-full"
-                  placeholder="Selecione um grupo"
-                  :loading="isGroupsLoading"
-                  @update:model-value="applyServerFilters"
-                />
+                <div class="flex items-center space-x-2">
+                  <UInputMenu
+                    v-model="selectedGroup"
+                    :items="groupOptions"
+                    value-key="value"
+                    class="w-full"
+                    placeholder="Selecione um grupo"
+                    :loading="isGroupsLoading"
+                    @update:model-value="applyServerFilters"
+                  />
+                  <UButton
+                    v-if="selectedGroup"
+                    color="primary"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    :loading="isLoading"
+                    @click="clearGroupFilter"
+                  />
+                </div>
               </UFormField>
             </div>
             <div>
               <UFormField label="Marca">
-                <UInputMenu
-                  v-model="selectedBrand"
-                  :items="brandOptions"
-                  value-key="value"
-                  class="w-full"
-                  placeholder="Selecione uma marca"
-                  :loading="isBrandsLoading"
-                  @update:model-value="applyServerFilters"
-                />
+                <div class="flex items-center space-x-2">
+                  <UInputMenu
+                    v-model="selectedBrand"
+                    :items="brandOptions"
+                    value-key="value"
+                    class="w-full"
+                    placeholder="Selecione uma marca"
+                    :loading="isBrandsLoading"
+                    @update:model-value="applyServerFilters"
+                  />
+                  <UButton
+                    v-if="selectedBrand"
+                    color="primary"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    :loading="isLoading"
+                    @click="clearBrandFilter"
+                  />
+                </div>
               </UFormField>
             </div>
             <div>
               <UFormField label="Princípio Ativo">
-                <UInputMenu
-                  v-model="selectedActiveIngredient"
-                  :items="activeIngredientOptions"
-                  value-key="value"
-                  class="w-full"
-                  placeholder="Selecione um princípio ativo"
-                  :loading="isActiveIngredientsLoading"
-                  @update:model-value="applyServerFilters"
-                />
+                <div class="flex items-center space-x-2">
+                  <UInputMenu
+                    v-model="selectedActiveIngredient"
+                    :items="activeIngredientOptions"
+                    value-key="value"
+                    class="w-full"
+                    placeholder="Selecione um princípio ativo"
+                    :loading="isActiveIngredientsLoading"
+                    @update:model-value="applyServerFilters"
+                  />
+                  <UButton
+                    v-if="selectedActiveIngredient"
+                    color="primary"
+                    variant="ghost"
+                    icon="i-heroicons-x-mark"
+                    :loading="isLoading"
+                    @click="clearActiveIngredientFilter"
+                  />
+                </div>
               </UFormField>
             </div>
           </div>
@@ -75,65 +114,91 @@
 
       <div class="flex items-center justify-between">
         <p class="text-sm text-gray-500">
-          Exibindo {{ displayedProducts.length }} de {{ totalProducts }} produtos
-          <span v-if="hasFilters" class="text-primary font-medium ml-1">(filtrados)</span>
+          Exibindo {{ displayedProducts.length }} de
+          {{ totalProducts }} produtos
+          <span v-if="hasFilters" class="text-primary font-medium ml-1"
+            >(filtrados)</span
+          >
         </p>
-        
-        <UButton 
+
+        <UButton
           v-if="hasFilters"
-          color="primary" 
-          variant="ghost" 
-          @click="resetFilters"
+          color="primary"
+          variant="ghost"
           icon="i-heroicons-x-mark"
           :loading="isLoading"
+          @click="resetFilters"
         >
           Limpar filtros
         </UButton>
       </div>
     </div>
-    
+
     <!-- Lista de produtos -->
     <div v-if="isLoading && !displayedProducts.length" class="py-8">
       <UCard v-for="i in 6" :key="i" class="mb-4 h-40">
-        <div class="animate-pulse bg-gray-200 h-full rounded"></div>
+        <div class="animate-pulse bg-gray-200 h-full rounded" />
       </UCard>
     </div>
-    
+
     <div v-else-if="!displayedProducts.length" class="text-center py-12">
       <div class="h-12 w-12 mx-auto text-gray-400 mb-4">
         <UIcon name="i-heroicons-face-frown" class="h-full w-full" />
       </div>
-      <h3 class="mt-4 text-lg font-medium text-gray-900">Nenhum produto encontrado</h3>
-      <p class="mt-1 text-sm text-gray-500">Tente ajustar seus filtros ou fazer uma nova pesquisa.</p>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">
+        Nenhum produto encontrado
+      </h3>
+      <p class="mt-1 text-sm text-gray-500">
+        Tente ajustar seus filtros ou fazer uma nova pesquisa.
+      </p>
     </div>
-    
+
     <div
       v-else
       ref="productsContainer"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
     >
-      <ProductCard 
-        v-for="product in displayedProducts" 
-        :key="product.produto_id" 
+      <ProductCard
+        v-for="product in displayedProducts"
+        :key="product.produto_id"
         :data="product"
         @click="selectProduct(product)"
-      />
-      
+      >
+        <template #actions>
+          <ProductUpdateModal
+            :product="product"
+            button-label="Editar"
+            button-icon="i-heroicons-pencil-square"
+            button-variant="ghost"
+            button-color="gray"
+            button-size="xs"
+            @update="handleProductUpdate"
+            @success="showToast"
+            @error="handleError"
+          />
+        </template>
+      </ProductCard>
+
       <!-- Elemento sentinel para infinite scroll -->
-      <div ref="sentinel" class="h-10 w-full col-span-full"></div>
+      <div ref="sentinel" class="h-10 w-full col-span-full" />
     </div>
-    
+
     <!-- Loading indicator -->
     <div v-if="isLoadingMore" class="flex justify-center my-6">
-      <div class="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      <div
+        class="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"
+      />
     </div>
-    
+
     <!-- Finished indicator -->
-    <div v-if="!hasMore && displayedProducts.length > 0" class="text-center my-8 text-gray-500">
+    <div
+      v-if="!hasMore && displayedProducts.length > 0"
+      class="text-center my-8 text-gray-500"
+    >
       <div class="flex items-center my-4">
-        <div class="flex-1 border-t border-gray-300"></div>
+        <div class="flex-1 border-t border-gray-300" />
         <p class="text-sm px-2">Fim dos resultados</p>
-        <div class="flex-1 border-t border-gray-300"></div>
+        <div class="flex-1 border-t border-gray-300" />
       </div>
     </div>
   </div>
@@ -144,6 +209,7 @@ import { ref, computed, onMounted, watch, nextTick, onUnmounted } from 'vue';
 import type { ProductDTO } from '../types';
 import { useProducts, type ProductFilters } from '../composables';
 import ProductCard from './ProductCard.vue';
+import { ProductUpdateModal } from './';
 
 // Estado
 const searchQuery = ref('');
@@ -156,20 +222,20 @@ const productsContainer = ref<HTMLElement | null>(null);
 const sentinel = ref<HTMLElement | null>(null);
 
 // Obter produtos do composable
-const { 
-  products, 
-  departments, 
-  isLoading, 
-  isDepartmentsLoading, 
-  loadMore, 
-  hasMore, 
+const {
+  products,
+  departments,
+  isLoading,
+  isDepartmentsLoading,
+  loadMore,
+  hasMore,
   refreshProducts,
   groups,
   brands,
   activeIngredients,
   isGroupsLoading,
   isBrandsLoading,
-  isActiveIngredientsLoading
+  isActiveIngredientsLoading,
 } = useProducts();
 
 // Computado para garantir que products seja sempre um array (importante para SSR)
@@ -180,9 +246,11 @@ const displayedProducts = computed(() => {
 // Contador total de produtos (para exibição)
 const totalProducts = computed(() => {
   if (!departments.value) return 0;
-  
+
   if (selectedDepartment.value) {
-    const dept = departments.value.find(d => d.departamento === selectedDepartment.value);
+    const dept = departments.value.find(
+      (d) => d.departamento === selectedDepartment.value
+    );
     return dept ? dept.count : 0;
   }
   // Soma total de todos os departamentos
@@ -192,44 +260,46 @@ const totalProducts = computed(() => {
 // Opções para o select de departamentos
 const departmentOptions = computed(() => {
   if (!departments.value) return [];
-  
-  return departments.value.map(dept => ({
+
+  return departments.value.map((dept) => ({
     label: `${dept.departamento} (${dept.count})`,
-    value: dept.departamento
+    value: dept.departamento,
   }));
 });
 
 // Opções para o select de grupos
 const groupOptions = computed(() => {
-  return groups.value.map(group => ({ 
-    label: group, 
-    value: group 
+  return groups.value.map((group) => ({
+    label: group,
+    value: group,
   }));
 });
 
 // Opções para o select de marcas
 const brandOptions = computed(() => {
-  return brands.value.map(brand => ({ 
-    label: brand, 
-    value: brand 
+  return brands.value.map((brand) => ({
+    label: brand,
+    value: brand,
   }));
 });
 
 // Opções para o select de princípios ativos
 const activeIngredientOptions = computed(() => {
-  return activeIngredients.value.map(ingredient => ({ 
-    label: ingredient, 
-    value: ingredient 
+  return activeIngredients.value.map((ingredient) => ({
+    label: ingredient,
+    value: ingredient,
   }));
 });
 
 // Verificar se há filtros ativos
 const hasFilters = computed(() => {
-  return !!searchQuery.value || 
-         !!selectedDepartment.value || 
-         !!selectedGroup.value ||
-         !!selectedBrand.value ||
-         !!selectedActiveIngredient.value;
+  return (
+    !!searchQuery.value ||
+    !!selectedDepartment.value ||
+    !!selectedGroup.value ||
+    !!selectedBrand.value ||
+    !!selectedActiveIngredient.value
+  );
 });
 
 // Debounce para o filtro de pesquisa
@@ -248,17 +318,37 @@ const getCurrentFilters = (): ProductFilters => {
     grupo: selectedGroup.value || undefined,
     marca: selectedBrand.value || undefined,
     principio_ativo: selectedActiveIngredient.value || undefined,
-    search: searchQuery.value?.trim() || undefined
+    search: searchQuery.value?.trim() || undefined,
   };
+};
+
+const clearDepartmentFilter = () => {
+  selectedDepartment.value = '';
+  applyServerFilters();
+};
+
+const clearGroupFilter = () => {
+  selectedGroup.value = '';
+  applyServerFilters();
+};
+
+const clearBrandFilter = () => {
+  selectedBrand.value = '';
+  applyServerFilters();
+};
+
+const clearActiveIngredientFilter = () => {
+  selectedActiveIngredient.value = '';
+  applyServerFilters();
 };
 
 // Aplicar filtros fazendo uma nova requisição ao servidor
 const applyServerFilters = async () => {
   // Montar objeto de filtros
   const filters = getCurrentFilters();
-  
+
   console.log('Aplicando filtros do servidor:', filters);
-  
+
   // Fazer nova requisição com os filtros
   await refreshProducts(filters);
 };
@@ -266,9 +356,9 @@ const applyServerFilters = async () => {
 // Carregar mais produtos
 const loadMoreItems = async () => {
   if (!hasMore.value || isLoadingMore.value || isLoading.value) return;
-  
+
   isLoadingMore.value = true;
-  
+
   try {
     // Carregar mais produtos (loadMore já aplica os filtros ativos)
     await loadMore();
@@ -286,7 +376,7 @@ const resetFilters = async () => {
   selectedGroup.value = '';
   selectedBrand.value = '';
   selectedActiveIngredient.value = '';
-  
+
   // Fazer nova requisição sem filtros
   await refreshProducts({});
 };
@@ -306,19 +396,24 @@ const setupIntersectionObserver = () => {
     observer.disconnect();
     observer = null;
   }
-  
+
   if (!window.IntersectionObserver || !sentinel.value) return;
-  
+
   observer = new IntersectionObserver(
-    entries => {
-      if (entries[0].isIntersecting && !isLoadingMore.value && !isLoading.value && hasMore.value) {
+    (entries) => {
+      if (
+        entries[0].isIntersecting &&
+        !isLoadingMore.value &&
+        !isLoading.value &&
+        hasMore.value
+      ) {
         console.log('Elemento sentinel visível, carregando mais itens...');
         loadMoreItems();
       }
     },
     { threshold: 0.1 }
   );
-  
+
   observer.observe(sentinel.value);
 };
 
@@ -334,7 +429,7 @@ onMounted(async () => {
   // Inicializar observer
   await nextTick();
   setupIntersectionObserver();
-  
+
   // Configurar evento de scroll para fallback
   window.addEventListener('scroll', () => {
     if (
@@ -354,9 +449,44 @@ onUnmounted(() => {
   if (observer) {
     observer.disconnect();
   }
-  
+
   if (searchTimeout) {
     clearTimeout(searchTimeout);
   }
 });
-</script> 
+
+// Handling product updates
+function handleProductUpdate(updatedProduct: Partial<ProductDTO>) {
+  // Find the product in the displayed products array and update it
+  const index = displayedProducts.value.findIndex(p => p.produto_id === updatedProduct.produto_id);
+  if (index !== -1) {
+    displayedProducts.value[index] = {
+      ...displayedProducts.value[index],
+      ...updatedProduct
+    };
+  }
+}
+
+// Toast notifications
+const toast = useToast();
+
+function showToast(message: string) {
+  toast.add({
+    title: 'Sucesso',
+    description: message,
+    color: 'green',
+    icon: 'i-heroicons-check-circle',
+    timeout: 3000
+  });
+}
+
+function handleError(error: Error) {
+  toast.add({
+    title: 'Erro',
+    description: error.message || 'Ocorreu um erro ao atualizar o produto.',
+    color: 'red',
+    icon: 'i-heroicons-exclamation-triangle',
+    timeout: 5000
+  });
+}
+</script>
