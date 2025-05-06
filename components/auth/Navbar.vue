@@ -21,7 +21,7 @@
                             content: 'w-48'
                         }"
                     >
-                        <UButton color="gray" variant="ghost" class="flex items-center gap-2">
+                        <UButton color="neutral" variant="ghost" class="flex items-center gap-2">
                             <UAvatar 
                                 v-if="user.user_metadata?.avatar_url" 
                                 :src="user.user_metadata.avatar_url" 
@@ -62,7 +62,7 @@ const handleLogout = async () => {
         toast.add({
             title: 'Logout realizado',
             description: 'Você foi desconectado com sucesso',
-            color: 'green',
+            color: 'success',
             icon: 'i-heroicons-check-circle'
         });
         
@@ -72,7 +72,7 @@ const handleLogout = async () => {
         toast.add({
             title: 'Erro ao fazer logout',
             description: 'Ocorreu um erro ao tentar desconectar',
-            color: 'red',
+            color: 'error',
             icon: 'i-heroicons-exclamation-circle'
         });
     } finally {
@@ -85,6 +85,11 @@ const userMenuItems = computed<DropdownMenuItem[]>(() => [
         label: 'Perfil',
         icon: 'i-heroicons-user',
         to: '/profile'
+    },
+    {
+        label: 'Árvore de Classificação',
+        icon: 'i-heroicons-chart-bar-square',
+        to: '/classification-tree'
     },
     {
         label: 'Sair',
